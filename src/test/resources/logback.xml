@@ -1,0 +1,16 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level [%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-30logger{10} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.flink.runtime.rest.handler.job.JobDetailsHandler" level="OFF" />
+    <logger name="org.apache.flink.runtime.rest.handler.job.JobExceptionsHandler" level="OFF" />
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
