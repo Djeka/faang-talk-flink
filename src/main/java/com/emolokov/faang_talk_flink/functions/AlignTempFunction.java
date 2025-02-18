@@ -9,9 +9,10 @@ public class AlignTempFunction extends RichMapFunction<TempRecord, TempRecord> i
     @Override
     public TempRecord map(TempRecord record) throws Exception {
         switch (record.getTempUnit()){
+            case "C": break;
             case "K": record.setTempValue(record.getTempValue() - 273); break;
             case "F": record.setTempValue((record.getTempValue() - 32) * 5.0/9.0); break;
-            case "C": record.setTempValue(record.getTempValue()); break;
+            default: throw new UnsupportedOperationException("Unsupported temp unit " + record.getTempUnit());
         }
 
         record.setTempUnit("C");

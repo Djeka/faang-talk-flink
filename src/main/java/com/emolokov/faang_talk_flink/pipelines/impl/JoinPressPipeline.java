@@ -1,5 +1,7 @@
 package com.emolokov.faang_talk_flink.pipelines.impl;
 
+import com.emolokov.faang_talk_flink.functions.AlignPressFunction;
+import com.emolokov.faang_talk_flink.functions.AlignTempFunction;
 import com.emolokov.faang_talk_flink.functions.JoinMetersFunction;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.model.records.JoinedRecord;
@@ -25,6 +27,9 @@ public class JoinPressPipeline extends FlinkPipeline {
         // get source data from the topic
         DataStream<TempRecord> tempStream = createSource(pipelineConfig.getTempMetersTopic(), TempRecord.class, 1);
         DataStream<PressRecord> pressStream = createSource(pipelineConfig.getPressMetersTopic(), PressRecord.class, 1);
+
+        tempStream = tempStream.map(new AlignTempFunction()).name("align-temp");
+        pressStream = pressStream.map(new AlignPressFunction()).name("align-press");
 
         KeyedStream<TempRecord, String> keyedTemp = tempStream.keyBy(r -> r.getLocationId());
         KeyedStream<PressRecord, String> keyedPress = pressStream.keyBy(r -> r.getLocationId());

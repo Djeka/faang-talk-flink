@@ -30,7 +30,7 @@ public abstract class EventsGenerator<R extends MeterRecord> {
 
     // generate meters templates that are used for meters records
     public static final List<Integer> LOCATIONS = IntStream.range(0, 3)
-            .boxed()
+            .mapToObj(i -> i + 1)
             .collect(Collectors.toList());
 
     private final double generateRatePerSecond;
@@ -78,8 +78,9 @@ public abstract class EventsGenerator<R extends MeterRecord> {
 
             Future<RecordMetadata> future = producer.send(producerRecord);
             RecordMetadata recordMetadata = future.get(1L, TimeUnit.SECONDS);
-            log.info("Produced to {}/{}: {}",
+            log.info("Produced to {}:{}:{} = {}",
                     recordMetadata.topic(),
+                    recordMetadata.partition(),
                     recordMetadata.offset(),
                     value.toString()
             );

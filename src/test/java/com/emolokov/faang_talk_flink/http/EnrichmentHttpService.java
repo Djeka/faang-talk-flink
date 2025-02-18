@@ -5,21 +5,22 @@ import com.sun.net.httpserver.HttpServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.flink.streaming.runtime.io.TestEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class EnrichmentHttpService {
 
+    private static final Pattern TEMP_METER_PATTERN = Pattern.compile("^temp-0*([0-9]+)$");
+    private static final Pattern PRESS_METER_PATTERN = Pattern.compile("^press-0*([1-9][0-9]*)$");
+
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private final HttpServer httpServer;
-
-    private List<TestEvent> testEvents;
 
     public EnrichmentHttpService(){
         try {
@@ -32,20 +33,24 @@ public class EnrichmentHttpService {
         createContext();
     }
 
-    public void setUsedTestEvents(List<TestEvent> testEvents){
-        this.testEvents = testEvents;
-    }
-
     private void createContext(){
         httpServer.createContext("/", httpExchange ->
         {
             String uriPath = httpExchange.getRequestURI().getPath();
-            String enrichmentKey = uriPath.substring(uriPath.lastIndexOf('/'));
+            String enrichmentKey = uriPath.substring(uriPath.lastIndexOf('/') + 1);
 
-            String enrichmentKeyHash = "gen" + enrichmentKey.hashCode();
+            Matcher tempMatcher = TEMP_METER_PATTERN.matcher(enrichmentKey);
+            Matcher pressMatcher = PRESS_METER_PATTERN.matcher(enrichmentKey);
+
+            String enrichmentValue = "Unknown "+ enrichmentKey;
+            if(tempMatcher.matches()){
+                enrichmentValue = String.format("Temperature meter %s", tempMatcher.group(1));
+            } else if(pressMatcher.matches()){
+                enrichmentValue = String.format("Pressure meter %s", pressMatcher.group(1));
+            }
 
             ObjectNode responseObject = JSON_MAPPER.createObjectNode();
-            responseObject.put("value", enrichmentKeyHash);
+            responseObject.put("value", enrichmentValue);
 
             sendResponse(httpExchange, 201, responseObject);
         });
