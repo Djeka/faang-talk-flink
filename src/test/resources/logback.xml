@@ -9,6 +9,7 @@
 
     <logger name="org.apache.flink.runtime.rest.handler.job.JobDetailsHandler" level="OFF" />
     <logger name="org.apache.flink.runtime.rest.handler.job.JobExceptionsHandler" level="OFF" />
+    <logger name="org.apache.flink.runtime.metrics.MetricRegistryImpl" level="OFF" />
 
     <root level="info">
         <appender-ref ref="STDOUT" />

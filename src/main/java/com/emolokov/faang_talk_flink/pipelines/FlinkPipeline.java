@@ -65,7 +65,7 @@ public abstract class FlinkPipeline {
         return WatermarkStrategy.<R>forMonotonousTimestamps()
             .withIdleness(Duration.ofMinutes(1))
             .withTimestampAssigner((SerializableTimestampAssigner<R>) (record, kafkaTimestamp) -> {
-                return record.getTimestamp();
+                return record.getEventTimestamp();
             });
     }
 

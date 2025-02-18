@@ -11,7 +11,7 @@ import java.io.Serializable;
 @ToString
 public class MeterRecord extends AbstractRecord implements Serializable {
 
-    public MeterRecord(String meterId, long timestamp, TempUnit tempUnit, double tempValue) {
+    public MeterRecord(String meterId, long timestamp, String tempUnit, double tempValue) {
         super(timestamp);
         this.meterId = meterId;
         this.tempUnit = tempUnit;
@@ -19,7 +19,7 @@ public class MeterRecord extends AbstractRecord implements Serializable {
     }
 
     private String meterId;
-    private TempUnit tempUnit;
+    private String tempUnit;
     private double tempValue;
 
     private Boolean duplicate;

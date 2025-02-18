@@ -10,14 +10,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.emolokov.faang_talk_flink.model.TempUnit.*;
-
 public class MeterRecordsGenerator extends EventsGenerator<MeterRecord> {
 
     // generate meters templates that are used for meters records
     public static final List<MeterTemplate> METER_TEMPLATES = IntStream.range(0, 3)
             .mapToObj(i -> {
-                var tempUnit = List.of(K, C, F).get(RANDOM.nextInt(3));
+                var tempUnit = List.of("K", "C", "F").get(RANDOM.nextInt(3));
                 return new MeterTemplate(
                                 UUID.randomUUID().toString(),
                                 tempUnit);
@@ -30,9 +28,9 @@ public class MeterRecordsGenerator extends EventsGenerator<MeterRecord> {
 
             double tempValue;
             switch (template.getTempUnit()){
-                case C: tempValue = 0   + 20.0 + 10.0 * (RANDOM.nextDouble() - 0.5); break;
-                case K: tempValue = 273 + 20.0 + 10.0 * (RANDOM.nextDouble() - 0.5); break;
-                case F: tempValue = 32  + 36 + 18.0 * (RANDOM.nextDouble() - 0.5); break;
+                case "C": tempValue = 0   + 20.0 + 10.0 * (RANDOM.nextDouble() - 0.5); break;
+                case "K": tempValue = 273 + 20.0 + 10.0 * (RANDOM.nextDouble() - 0.5); break;
+                case "F": tempValue = 32  + 36 + 18.0 * (RANDOM.nextDouble() - 0.5); break;
                 default: throw new RuntimeException("Unsupported tempUnit: " + template.getTempUnit());
             }
 

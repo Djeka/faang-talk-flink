@@ -9,11 +9,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class MeterTemplate implements Serializable {
 
-    public MeterTemplate(String meterId, TempUnit tempUnit) {
+    public MeterTemplate(String meterId, String tempUnit) {
         this.meterId = meterId;
         this.tempUnit = tempUnit;
     }
 
     private String meterId;
-    private TempUnit tempUnit;
+    private String tempUnit;
 }

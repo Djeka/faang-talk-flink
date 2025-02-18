@@ -4,7 +4,7 @@ price-topic: price_topic
 kafka-broker-bootstrap-servers: 127.0.0.1:29092
 meters-records-gen-rate-per-sec: 1.0
 price-records-gen-rate-per-sec: 1.0
-unchain-operators: false
+disable-operators-chain: false
 #kafka-params:
 #  bootstrap.servers: 127.0.0.1:29092
 #  group.id: test-consumer

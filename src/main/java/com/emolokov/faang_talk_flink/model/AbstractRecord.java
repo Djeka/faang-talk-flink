@@ -9,7 +9,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgn
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class AbstractRecord {
-    private long timestamp;
+    private long eventTimestamp;
 
     @JsonIgnore
     public abstract String getId();
