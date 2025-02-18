@@ -28,12 +28,12 @@ public class DeduplicatePipeline extends FlinkPipeline {
                 // align temp
                 .map(new AlignTempFunction())
                 .keyBy(TempRecord::getMeterId) // key by meter_id
-                .flatMap(new DeduplicateFunction(pipelineConfig, Duration.ofSeconds(60))) // use a flat map function with a TTL state
+                .flatMap(new DeduplicateFunction<TempRecord>(pipelineConfig, Duration.ofSeconds(60))) // use a flat map function with a TTL state
                 .name("stated-stream");
 
 //        statefulStream.filter(v -> false).print();
-//        stream.print();
-        stream.sinkTo(sink()).name("sink");
+        stream.print();
+//        stream.sinkTo(sink()).name("sink");
     }
 
 }

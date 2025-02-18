@@ -1,7 +1,7 @@
 package com.emolokov.faang_talk_flink.functions;
 
-import com.emolokov.faang_talk_flink.model.records.TempRecord;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
+import com.emolokov.faang_talk_flink.model.records.MeterRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Slf4j
-public class EnrichmentFunction extends RichAsyncFunction<TempRecord, TempRecord> implements Serializable {
+public class EnrichmentFunction<R extends MeterRecord> extends RichAsyncFunction<R, R> implements Serializable {
 
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
@@ -27,7 +27,7 @@ public class EnrichmentFunction extends RichAsyncFunction<TempRecord, TempRecord
     }
 
     @Override
-    public void asyncInvoke(TempRecord record, ResultFuture<TempRecord> resultFuture) throws Exception {
+    public void asyncInvoke(R record, ResultFuture<R> resultFuture) throws Exception {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // Define the target URL
             String getUrl = pipelineConfig.getEnrichmentEndpoint() + "/" + record.getMeterId();
@@ -68,7 +68,7 @@ public class EnrichmentFunction extends RichAsyncFunction<TempRecord, TempRecord
     }
 
     @Override
-    public void timeout(TempRecord record, ResultFuture<TempRecord> resultFuture) throws Exception {
+    public void timeout(R record, ResultFuture<R> resultFuture) throws Exception {
         resultFuture.complete(List.of(record)); // skip enrichment
     }
 }

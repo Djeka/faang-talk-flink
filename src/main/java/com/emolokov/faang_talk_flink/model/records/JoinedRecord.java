@@ -13,11 +13,15 @@ public class JoinedRecord extends Record {
 
     private long tempTimestamp;
     private String tempMeterId;
+    private String tempMeterName;
+    private Boolean tempDuplicate;
     private String tempUnit;
     private double tempValue;
 
     private long pressTimestamp;
     private String pressMeterId;
+    private String pressMeterName;
+    private Boolean pressDuplicate;
     private String pressUnit;
     private double pressValue;
 
@@ -32,6 +36,8 @@ public class JoinedRecord extends Record {
 
         this.tempTimestamp = tempRecord.getEventTimestamp();
         this.tempMeterId = tempRecord.getMeterId();
+        this.tempMeterName = tempRecord.getMeterName();
+        this.tempDuplicate = tempRecord.getDuplicate();
         this.tempUnit = tempRecord.getTempUnit();
         this.tempValue = tempRecord.getTempValue();
     }
@@ -41,6 +47,8 @@ public class JoinedRecord extends Record {
 
         this.pressTimestamp = pressRecord.getEventTimestamp();
         this.pressMeterId = pressRecord.getMeterId();
+        this.pressMeterName = pressRecord.getMeterName();
+        this.pressDuplicate = pressRecord.getDuplicate();
         this.pressUnit = pressRecord.getPressUnit();
         this.pressValue = pressRecord.getPressValue();
     }
@@ -52,7 +60,10 @@ public class JoinedRecord extends Record {
                 ", tempValue=" + tempValue +
                 ", pressUnit=" + pressUnit +
                 ", pressValue=" + pressValue +
-                ", meterId=" + pressMeterId +
+                ", tempMeterId=" + tempMeterId +
+                ", tempMeterName=" + tempMeterName +
+                ", pressMeterId=" + pressMeterId +
+                ", pressMeterName=" + pressMeterName +
                 ", locationId=" + locationId +
                 ", tempTimestamp=" + tempTimestamp +
                 ", pressTimestamp=" + pressTimestamp +

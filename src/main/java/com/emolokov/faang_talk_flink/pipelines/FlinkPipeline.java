@@ -1,5 +1,6 @@
 package com.emolokov.faang_talk_flink.pipelines;
 
+import com.emolokov.faang_talk_flink.functions.EnrichmentFunction;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.model.records.MeterRecord;
 import com.emolokov.faang_talk_flink.model.records.Record;
@@ -14,12 +15,16 @@ import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import java.time.Duration;
 import java.util.Properties;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @AllArgsConstructor
 @Getter
@@ -48,6 +53,15 @@ public abstract class FlinkPipeline {
     }
 
     protected abstract void buildFlinkPipeline();
+
+    protected <R extends MeterRecord> SingleOutputStreamOperator<R> enrich(DataStream<R> input){
+        return AsyncDataStream.orderedWait(
+                input,
+                new EnrichmentFunction(pipelineConfig),
+                1L, SECONDS,
+                10
+        );
+    }
 
     protected <R extends MeterRecord> DataStream<R> createSource(String topic, Class<R> clazz, int parallelism) {
         Properties kafkaProps = new Properties();

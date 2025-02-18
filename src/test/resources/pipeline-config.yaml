@@ -2,7 +2,7 @@ temp-meters-topic: temp_records_topic
 press-meters-topic: press_records_topic
 sink-topic: sink_topic
 kafka-bootstrap-servers: 127.0.0.1:29092
-disable-operators-chain: false
+disable-operators-chain: true
 flink-config:
   parallelism.default: 1
 
