@@ -1,6 +1,10 @@
 package com.emolokov.faang_talk_flink.pipelines;
 
-import com.emolokov.faang_talk_flink.model.*;
+import com.emolokov.faang_talk_flink.model.PipelineConfig;
+import com.emolokov.faang_talk_flink.model.records.MeterRecord;
+import com.emolokov.faang_talk_flink.model.records.Record;
+import com.emolokov.faang_talk_flink.model.serde.MeterRecordDeserializer;
+import com.emolokov.faang_talk_flink.model.serde.MeterRecordSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +49,7 @@ public abstract class FlinkPipeline {
 
     protected abstract void buildFlinkPipeline();
 
-    protected <R extends AbstractRecord> DataStream<R> createSource(String topic, Class<R> clazz, int parallelism) {
+    protected <R extends MeterRecord> DataStream<R> createSource(String topic, Class<R> clazz, int parallelism) {
         Properties kafkaProps = new Properties();
         kafkaProps.putAll(pipelineConfig.getKafkaParams());
 
@@ -56,12 +60,12 @@ public abstract class FlinkPipeline {
                 .setDeserializer(new MeterRecordDeserializer<R>(clazz))
                 .build();
 
-        return env.fromSource(kafkaSource, watermarkStrategy(), pipelineConfig.getMetersTopic())
-                .name("source-from-" + pipelineConfig.getMetersTopic())
+        return env.fromSource(kafkaSource, watermarkStrategy(), topic)
+                .name("source-from-" + topic)
                 .setParallelism(parallelism);
     }
 
-    private <R extends AbstractRecord> WatermarkStrategy<R> watermarkStrategy() {
+    private <R extends MeterRecord> WatermarkStrategy<R> watermarkStrategy() {
         return WatermarkStrategy.<R>forMonotonousTimestamps()
             .withIdleness(Duration.ofMinutes(1))
             .withTimestampAssigner((SerializableTimestampAssigner<R>) (record, kafkaTimestamp) -> {
@@ -69,14 +73,16 @@ public abstract class FlinkPipeline {
             });
     }
 
-    protected KafkaSink<MeterRecord> sink() {
+    protected <R extends Record> KafkaSink<R> sink() {
         Properties kafkaProps = new Properties();
         kafkaProps.putAll(pipelineConfig.getKafkaParams());
 
-        return KafkaSink.<MeterRecord>builder()
+        return KafkaSink.<R>builder()
                 .setKafkaProducerConfig(kafkaProps)
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-                .setRecordSerializer(new MeterRecordSerializer(pipelineConfig.getSinkTopic()))
+                .setRecordSerializer(new MeterRecordSerializer<R>(pipelineConfig.getSinkTopic()))
                 .build();
     }
+
+
 }

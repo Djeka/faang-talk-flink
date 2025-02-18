@@ -10,26 +10,20 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class PipelineConfig implements Serializable {
-    @JsonProperty("meters-topic")
-    private String metersTopic;
+    @JsonProperty("temp-meters-topic")
+    private String tempMetersTopic;
+
+    @JsonProperty("press-meters-topic")
+    private String pressMetersTopic;
 
     @JsonProperty("sink-topic")
     private String sinkTopic;
 
-    @JsonProperty("price-topic")
-    private String priceTopic;
-
     @JsonProperty("kafka-params")
     private Map<String, String> kafkaParams;
 
-    @JsonProperty("kafka-broker-bootstrap-servers")
-    private String kafkaBrokerBootstrapServers;
-
-    @JsonProperty("meters-records-gen-rate-per-sec")
-    private Double metersRecordsGenRatePerSec = 0.0;
-
-    @JsonProperty("price-records-gen-rate-per-sec")
-    private Double priceRecordsGenRatePerSec = 0.0;
+    @JsonProperty("kafka-bootstrap-servers")
+    private String kafkaBootstrapServers;
 
     @JsonProperty("disable-operators-chain")
     private boolean disableOperatorsChain = false;

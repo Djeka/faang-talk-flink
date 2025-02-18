@@ -1,7 +1,8 @@
 package com.emolokov.faang_talk_flink.functions;
 
-import com.emolokov.faang_talk_flink.model.MeterRecord;
-import com.emolokov.faang_talk_flink.model.PriceRecord;
+import com.emolokov.faang_talk_flink.model.records.JoinedRecord;
+import com.emolokov.faang_talk_flink.model.records.TempRecord;
+import com.emolokov.faang_talk_flink.model.records.PressRecord;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -26,13 +27,14 @@ public class SqlJoin {
         this.tableEnv = StreamTableEnvironment.create(env);
     }
 
-    public DataStream<MeterRecord> sqlJoin(DataStream<MeterRecord> meterStream, DataStream<PriceRecord> priceStream, String sqlQuery) {
-        // Register the MeterRecord stream
+    public DataStream<JoinedRecord> sqlJoin(DataStream<TempRecord> meterStream, DataStream<PressRecord> pressStream, String sqlQuery) {
+        // Register the TempRecord stream
         tableEnv.createTemporaryView(
-                "METERS", // the SQL table name
+                "TEMP_RECORDS", // the SQL table name
                 meterStream,
                 Schema.newBuilder()
                         .column("meterId", DataTypes.STRING())
+                        .column("locationId", DataTypes.STRING())
                         .column("tempUnit", DataTypes.STRING())
                         .column("tempValue", DataTypes.DOUBLE())
                         .column("duplicate", DataTypes.BOOLEAN())
@@ -47,13 +49,17 @@ public class SqlJoin {
                         .build()
         );
 
-        // Register the PriceRecord stream
+        // Register the PressRecord stream
         tableEnv.createTemporaryView(
-                "PRICES",
-                priceStream,
+                "PRESS_RECORDS", // the SQL table name
+                pressStream,
                 Schema.newBuilder()
                         .column("meterId", DataTypes.STRING())
-                        .column("price", DataTypes.DOUBLE())
+                        .column("locationId", DataTypes.STRING())
+                        .column("pressUnit", DataTypes.STRING())
+                        .column("pressValue", DataTypes.DOUBLE())
+                        .column("duplicate", DataTypes.BOOLEAN())
+                        .column("meterName", DataTypes.STRING())
                         // Event-time column with watermark
                         .column("eventTimestamp", DataTypes.BIGINT())
                         .columnByExpression(
@@ -74,10 +80,10 @@ public class SqlJoin {
                         recordMap.put(fieldName, String.valueOf(fieldValue));
                     }
 
-                    return JSON_MAPPER.convertValue(recordMap, MeterRecord.class);
+                    return JSON_MAPPER.convertValue(recordMap, JoinedRecord.class);
                 });
 
 //        Table resultTable = tableEnv.sqlQuery(sqlQuery);
-//        return tableEnv.toDataStream(resultTable, MeterRecord.class);
+//        return tableEnv.toDataStream(resultTable, JoinedRecord.class);
     }
 }

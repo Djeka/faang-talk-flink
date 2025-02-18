@@ -1,5 +1,6 @@
-package com.emolokov.faang_talk_flink.model;
+package com.emolokov.faang_talk_flink.model.serde;
 
+import com.emolokov.faang_talk_flink.model.records.MeterRecord;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.io.IOException;
 
-public class MeterRecordDeserializer<R extends AbstractRecord> implements KafkaRecordDeserializationSchema<R> {
+public class MeterRecordDeserializer<R extends MeterRecord> implements KafkaRecordDeserializationSchema<R> {
 
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 

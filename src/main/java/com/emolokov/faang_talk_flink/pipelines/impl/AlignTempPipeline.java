@@ -1,7 +1,7 @@
 package com.emolokov.faang_talk_flink.pipelines.impl;
 
 import com.emolokov.faang_talk_flink.functions.AlignTempFunction;
-import com.emolokov.faang_talk_flink.model.MeterRecord;
+import com.emolokov.faang_talk_flink.model.records.TempRecord;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.pipelines.FlinkPipeline;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class AlignTempPipeline extends FlinkPipeline {
     @Override
     protected void buildFlinkPipeline(){
         // get source data from the topic
-        DataStream<MeterRecord> metersStream = createSource(pipelineConfig.getMetersTopic(), MeterRecord.class, 1);
+        DataStream<TempRecord> metersStream = createSource(pipelineConfig.getTempMetersTopic(), TempRecord.class, 1);
 
         // save to state
         var stream = metersStream
@@ -27,7 +27,7 @@ public class AlignTempPipeline extends FlinkPipeline {
                 .name("aligned-stream");
 
 //        stream.filter(v -> false).print();
-//        stream.print();
-        stream.sinkTo(sink()).name("sink");
+        stream.print();
+//        stream.sinkTo(sink()).name("sink");
     }
 }

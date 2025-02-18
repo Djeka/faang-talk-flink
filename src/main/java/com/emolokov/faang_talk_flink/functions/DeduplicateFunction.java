@@ -1,6 +1,6 @@
 package com.emolokov.faang_talk_flink.functions;
 
-import com.emolokov.faang_talk_flink.model.MeterRecord;
+import com.emolokov.faang_talk_flink.model.records.TempRecord;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.StateTtlConfig;
@@ -14,7 +14,7 @@ import org.apache.flink.util.Collector;
 import java.time.Duration;
 import java.util.Optional;
 
-public class DeduplicateFunction extends RichFlatMapFunction<MeterRecord, MeterRecord> {
+public class DeduplicateFunction extends RichFlatMapFunction<TempRecord, TempRecord> {
 
     private final PipelineConfig pipelineConfig;
     private final Duration windowDuration;
@@ -39,7 +39,7 @@ public class DeduplicateFunction extends RichFlatMapFunction<MeterRecord, MeterR
     }
 
     @Override
-    public void flatMap(MeterRecord record, Collector<MeterRecord> out) throws Exception {
+    public void flatMap(TempRecord record, Collector<TempRecord> out) throws Exception {
         boolean seenMeterRecord = Optional.ofNullable(this.metersRecords.value()).orElse(false);
         this.metersRecords.update(true);
 

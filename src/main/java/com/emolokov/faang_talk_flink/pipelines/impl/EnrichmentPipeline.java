@@ -1,7 +1,7 @@
 package com.emolokov.faang_talk_flink.pipelines.impl;
 
 import com.emolokov.faang_talk_flink.functions.EnrichmentFunction;
-import com.emolokov.faang_talk_flink.model.MeterRecord;
+import com.emolokov.faang_talk_flink.model.records.TempRecord;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.pipelines.FlinkPipeline;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class EnrichmentPipeline extends FlinkPipeline {
     @Override
     protected void buildFlinkPipeline(){
         // get source data from the topic
-        DataStream<MeterRecord> metersStream = createSource(pipelineConfig.getMetersTopic(), MeterRecord.class, 1);
+        DataStream<TempRecord> metersStream = createSource(pipelineConfig.getTempMetersTopic(), TempRecord.class, 1);
 
         // save to state
         var stream = enrich(metersStream)
@@ -33,7 +33,7 @@ public class EnrichmentPipeline extends FlinkPipeline {
         stream.sinkTo(sink()).name("sink");
     }
 
-    private SingleOutputStreamOperator<MeterRecord> enrich(DataStream<MeterRecord> input){
+    private SingleOutputStreamOperator<TempRecord> enrich(DataStream<TempRecord> input){
         return AsyncDataStream.orderedWait(
                 input,
                 new EnrichmentFunction(pipelineConfig),

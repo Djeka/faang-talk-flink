@@ -1,12 +1,9 @@
 package com.emolokov.faang_talk_flink.pipelines;
 
-import com.emolokov.faang_talk_flink.generator.EventsGenerator;
-import com.emolokov.faang_talk_flink.generator.MeterRecordsGenerator;
-import com.emolokov.faang_talk_flink.generator.PriceRecordsGenerator;
+import com.emolokov.faang_talk_flink.generator.PressRecordsGenerator;
+import com.emolokov.faang_talk_flink.generator.TempRecordsGenerator;
 import com.emolokov.faang_talk_flink.http.EnrichmentHttpService;
-import com.emolokov.faang_talk_flink.model.MeterRecord;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
-import com.emolokov.faang_talk_flink.model.PriceRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
@@ -31,8 +28,6 @@ public abstract class FlinkPipelineTest {
     private EnrichmentHttpService enrichmentService;
     protected PipelineConfig pipelineConfig;
     protected FlinkPipeline pipeline;
-    protected EventsGenerator<MeterRecord> meterRecordsGenerator;
-    protected EventsGenerator<PriceRecord> priceRecordGenerator;
 
     protected abstract FlinkPipeline createPipeline() throws IOException;
 
@@ -49,8 +44,8 @@ public abstract class FlinkPipelineTest {
 //        broker.createTopic(pipelineConfig.getSinkTopic());
 
         // start events generators
-        new MeterRecordsGenerator(pipelineConfig).start();
-        new PriceRecordsGenerator(pipelineConfig).start();
+        new TempRecordsGenerator(pipelineConfig).start();
+        new PressRecordsGenerator(pipelineConfig).start();
 
         this.pipeline = createPipeline();
     }
@@ -68,7 +63,7 @@ public abstract class FlinkPipelineTest {
     private PipelineConfig initPipelineConfig(String pipelineConfigFile) throws IOException {
         PipelineConfig pipelineConfig = YAML_MAPPER.readValue(getClass().getResourceAsStream("/" + pipelineConfigFile), PipelineConfig.class);
         pipelineConfig.setKafkaParams(Map.of(
-                BOOTSTRAP_SERVERS_CONFIG, pipelineConfig.getKafkaBrokerBootstrapServers(),
+                BOOTSTRAP_SERVERS_CONFIG, pipelineConfig.getKafkaBootstrapServers(),
                 ConsumerConfig.GROUP_ID_CONFIG, "test-consumer",
                 ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "900000"
         ));

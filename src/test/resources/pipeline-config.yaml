@@ -1,13 +1,8 @@
-meters-topic: meters_topic
+temp-meters-topic: temp_records_topic
+press-meters-topic: press_records_topic
 sink-topic: sink_topic
-price-topic: price_topic
-kafka-broker-bootstrap-servers: 127.0.0.1:29092
-meters-records-gen-rate-per-sec: 1.0
-price-records-gen-rate-per-sec: 1.0
+kafka-bootstrap-servers: 127.0.0.1:29092
 disable-operators-chain: false
-#kafka-params:
-#  bootstrap.servers: 127.0.0.1:29092
-#  group.id: test-consumer
 flink-config:
   parallelism.default: 1
 

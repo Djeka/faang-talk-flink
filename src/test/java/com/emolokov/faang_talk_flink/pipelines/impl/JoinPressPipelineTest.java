@@ -9,9 +9,9 @@ import java.io.IOException;
 
 
 @Slf4j
-public class JoinPricePipelineTest extends FlinkPipelineTest {
+public class JoinPressPipelineTest extends FlinkPipelineTest {
     protected FlinkPipeline createPipeline() throws IOException {
-        return new JoinPricePipeline(this.pipelineConfig, prepareFlinkEnv());
+        return new JoinPressPipeline(this.pipelineConfig, prepareFlinkEnv());
     }
 
     @Test

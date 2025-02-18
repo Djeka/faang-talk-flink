@@ -1,6 +1,6 @@
 package com.emolokov.faang_talk_flink.generator;
 
-import com.emolokov.faang_talk_flink.model.AbstractRecord;
+import com.emolokov.faang_talk_flink.model.records.MeterRecord;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +19,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @AllArgsConstructor
-public abstract class EventsGenerator<R extends AbstractRecord> {
+public abstract class EventsGenerator<R extends MeterRecord> {
     protected static final SecureRandom RANDOM = new SecureRandom();
     protected static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
+    // generate meters templates that are used for meters records
+    public static final List<Integer> LOCATIONS = IntStream.range(0, 3)
+            .boxed()
+            .collect(Collectors.toList());
 
     private final double generateRatePerSecond;
     private final String brokerBootstrapServers;
     private String topic;
-    private final Class<R> eventClass;
     private final Supplier<List<R>> eventsSupplier;
 
     public void start(){
@@ -45,7 +51,7 @@ public abstract class EventsGenerator<R extends AbstractRecord> {
                 try {
                     records.forEach(record -> {
                         produceToKafka(producer,
-                                record.getId(),
+                                record.getMeterId(),
                                 JSON_MAPPER.valueToTree(record),
                                 Map.of()
                         );
