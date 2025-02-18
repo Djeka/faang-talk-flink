@@ -12,42 +12,41 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-public class AvgTempFunction extends RichFlatMapFunction<MeterRecord, MeterRecord> {
+public class DeduplicateFunction extends RichFlatMapFunction<MeterRecord, MeterRecord> {
 
     private final PipelineConfig pipelineConfig;
     private final Duration windowDuration;
 
-    private ValueState<List<Double>> tempValues;
+    private ValueState<Boolean> metersRecords;
 
-    public AvgTempFunction(PipelineConfig pipelineConfig, Duration windowDuration) {
+    public DeduplicateFunction(PipelineConfig pipelineConfig, Duration windowDuration) {
         this.pipelineConfig = pipelineConfig;
         this.windowDuration = windowDuration;
     }
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        ValueStateDescriptor<List<Double>> descriptor = new ValueStateDescriptor<>("temp_values", Types.LIST(Types.DOUBLE));
+        ValueStateDescriptor<Boolean> descriptor = new ValueStateDescriptor<>("deduplicate-meters-records", Types.BOOLEAN);
         descriptor.enableTimeToLive(StateTtlConfig
                 .newBuilder(Time.seconds(windowDuration.getSeconds()))
                 .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
                 .cleanupFullSnapshot()
                 .build());
 
-        this.tempValues = getRuntimeContext().getState(descriptor);
+        this.metersRecords = getRuntimeContext().getState(descriptor);
     }
 
     @Override
     public void flatMap(MeterRecord record, Collector<MeterRecord> out) throws Exception {
-        List<Double> tempValues = this.tempValues.value();
-        if(tempValues == null) {
-            tempValues = new ArrayList<>();
-        }
+        boolean seenMeterRecord = Optional.ofNullable(this.metersRecords.value()).orElse(false);
+        this.metersRecords.update(true);
 
-        tempValues.add(record.getTempValue());
-        record.setAvgTemp(tempValues.stream().mapToDouble(v -> v).average().getAsDouble());
+        if(seenMeterRecord) {
+            // mark as duplicate
+            record.setDuplicate(true);
+        }
 
         out.collect(record);
     }

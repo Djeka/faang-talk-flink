@@ -1,8 +1,13 @@
-source-topic: input-topic
-sink-topic: output-topic
-kafka-params:
-  bootstrap.servers: 127.0.0.1:9092
-  group.id: test-consumer
+meters-topic: meters_topic
+sink-topic: sink_topic
+price-topic: price_topic
+kafka-broker-bootstrap-servers: 127.0.0.1:29092
+meters-records-gen-rate-per-sec: 1.0
+price-records-gen-rate-per-sec: 1.0
+unchain-operators: false
+#kafka-params:
+#  bootstrap.servers: 127.0.0.1:29092
+#  group.id: test-consumer
 flink-config:
   parallelism.default: 1
 
@@ -62,5 +67,11 @@ flink-config:
   metrics.reporter.grph.host: localhost
   metrics.reporter.grph.interval: 1 SECONDS
   metrics.reporter.grph.port: 2003
-  metrics.reporter.grph.prefix: faang
+  metrics.reporter.grph.prefix: faang.align-temp-pipeline
   metrics.reporter.grph.protocol: TCP
+  metrics.scope.jm: jm.self
+  metrics.scope.jm.job: jm.job
+  metrics.scope.operator: tm.op.<operator_name>.<subtask_index>
+  metrics.scope.task: tm.tsk.<task_name>.<subtask_index>
+  metrics.scope.tm: tm.self.<host>
+  metrics.scope.tm.job: tm.job.<host>

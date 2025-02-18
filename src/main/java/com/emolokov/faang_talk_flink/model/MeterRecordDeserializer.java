@@ -8,20 +8,26 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.io.IOException;
 
-public class MeterRecordDeserializer implements KafkaRecordDeserializationSchema<MeterRecord> {
+public class MeterRecordDeserializer<R extends AbstractRecord> implements KafkaRecordDeserializationSchema<R> {
 
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
-    @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> consumedRecord, Collector<MeterRecord> out) throws IOException {
-        if(consumedRecord.value() == null) return; // ignore null values
+    private final Class<R> clazz;
 
-        MeterRecord meterRecord = JSON_MAPPER.readValue(consumedRecord.value(), MeterRecord.class);
-        out.collect(meterRecord);
+    public MeterRecordDeserializer(Class<R> clazz) {
+        this.clazz = clazz;
     }
 
     @Override
-    public TypeInformation<MeterRecord> getProducedType() {
-        return TypeInformation.of(MeterRecord.class);
+    public void deserialize(ConsumerRecord<byte[], byte[]> consumedRecord, Collector<R> out) throws IOException {
+        if(consumedRecord.value() == null) return; // ignore null values
+
+        R record = JSON_MAPPER.readValue(consumedRecord.value(), clazz);
+        out.collect(record);
+    }
+
+    @Override
+    public TypeInformation<R> getProducedType() {
+        return TypeInformation.of(clazz);
     }
 }
