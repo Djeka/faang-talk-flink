@@ -9,6 +9,6 @@ import org.junit.jupiter.api.Test;
 public class SqlPipelineTest extends FlinkPipelineTest {
     @Test
     public void testPipeline() throws Exception {
-        new SqlPipeline(getPipelineConfig(), env()).run();
+        new SqlPipeline(getPipelineConfig(), env("sql-pipeline")).run();
     }
 }

@@ -35,9 +35,10 @@ public class TempRecordsGenerator extends EventsGenerator<TempRecord> {
                 default: throw new RuntimeException("Unsupported tempUnit: " + template.getUnit());
             }
 
+            var timestamp = System.currentTimeMillis();
             return List.of(
                     new TempRecord(
-                            System.currentTimeMillis(),
+                            timestamp,
                             template.getMeterId(),
                             template.getLocationId(),
                             template.getUnit(),

@@ -46,7 +46,7 @@ public class SqlPipeline extends FlinkPipeline {
         DataStream<JoinedRecord> stream = new SqlJoin(env).sqlJoin(tempStream, pressStream, sqlQuery);
 
 //        stream.filter(v -> false).print();
-        stream.print();
-//        stream.sinkTo(sink()).name("sink");
+//        stream.print();
+        stream.sinkTo(sink()).name("sink");
     }
 }

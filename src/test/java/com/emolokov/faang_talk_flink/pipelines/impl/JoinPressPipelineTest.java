@@ -9,6 +9,6 @@ import org.junit.jupiter.api.Test;
 public class JoinPressPipelineTest extends FlinkPipelineTest {
     @Test
     public void testPipeline() throws Exception {
-        new JoinPressPipeline(getPipelineConfig(), env()).run();
+        new JoinPressPipeline(getPipelineConfig(), env("join-pipeline")).run();
     }
 }

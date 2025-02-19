@@ -66,7 +66,7 @@ public abstract class FlinkPipeline {
     protected abstract void buildFlinkPipeline();
 
     protected <R extends MeterRecord> SingleOutputStreamOperator<R> enrich(DataStream<R> input){
-        return AsyncDataStream.orderedWait(
+        return AsyncDataStream.unorderedWait(
                 input,
                 new EnrichmentFunction(pipelineConfig),
                 1L, SECONDS,

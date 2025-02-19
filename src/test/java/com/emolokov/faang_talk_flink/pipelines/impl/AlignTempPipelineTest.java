@@ -10,6 +10,6 @@ public class AlignTempPipelineTest extends FlinkPipelineTest {
 
     @Test
     public void testPipeline() throws Exception {
-        new AlignTempPipeline(getPipelineConfig(), env()).run();
+        new AlignTempPipeline(getPipelineConfig(), env("align-temp-pipeline")).run();
     }
 }

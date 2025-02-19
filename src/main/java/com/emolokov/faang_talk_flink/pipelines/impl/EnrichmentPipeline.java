@@ -24,7 +24,7 @@ public class EnrichmentPipeline extends FlinkPipeline {
                 .name("enriched-stream");
 
 //        stream.filter(v -> false).print();
-        stream.print();
-//        stream.sinkTo(sink()).name("sink");
+//        stream.print();
+        stream.sinkTo(sink()).name("sink");
     }
 }

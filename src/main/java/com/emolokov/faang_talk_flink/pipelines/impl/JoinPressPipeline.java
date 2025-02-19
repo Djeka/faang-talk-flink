@@ -1,5 +1,8 @@
 package com.emolokov.faang_talk_flink.pipelines.impl;
 
+import com.emolokov.faang_talk_flink.functions.AlignPressFunction;
+import com.emolokov.faang_talk_flink.functions.AlignTempFunction;
+import com.emolokov.faang_talk_flink.functions.DeduplicateFunction;
 import com.emolokov.faang_talk_flink.functions.JoinMetersFunction;
 import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.model.records.JoinedRecord;
@@ -26,26 +29,30 @@ public class JoinPressPipeline extends FlinkPipeline {
         DataStream<PressRecord> pressStream = createSource(pipelineConfig.getPressMetersTopic(), PressRecord.class, 1);
 
 //        // align units
-//        tempStream = tempStream.map(new AlignTempFunction()).name("temp-align");
-//        pressStream = pressStream.map(new AlignPressFunction()).name("press-align");
+        tempStream = tempStream.map(new AlignTempFunction()).name("temp-align");
+        pressStream = pressStream.map(new AlignPressFunction()).name("press-align");
 
 //        // enrich
-//        tempStream = enrich(tempStream).name("temp-enriched");
-//        pressStream = enrich(pressStream).name("press-enriched");
+        tempStream = enrich(tempStream).name("temp-enriched");
+        pressStream = enrich(pressStream).name("press-enriched");
 
 //        // deduplicate
-//        tempStream = tempStream
-//                .keyBy(r -> r.getLocationId())
-//                .flatMap(new DeduplicateFunction<TempRecord>(pipelineConfig, Duration.ofSeconds(5)))
-//                .name("temp-deduplicate");
-//        pressStream = pressStream
-//                .keyBy(r -> r.getLocationId())
-//                .flatMap(new DeduplicateFunction<PressRecord>(pipelineConfig, Duration.ofSeconds(5)))
-//                .name("press-deduplicate");
+        tempStream = tempStream
+                .keyBy(r -> r.getLocationId())
+                .flatMap(new DeduplicateFunction<TempRecord>(pipelineConfig, Duration.ofSeconds(5)))
+                .name("temp-deduplicate");
+        pressStream = pressStream
+                .keyBy(r -> r.getLocationId())
+                .flatMap(new DeduplicateFunction<PressRecord>(pipelineConfig, Duration.ofSeconds(5)))
+                .name("press-deduplicate");
 
         // key by location
-        DataStream<TempRecord> keyedTemp = tempStream.keyBy(r -> r.getLocationId());
-        DataStream<PressRecord> keyedPress = pressStream.keyBy(r -> r.getLocationId());
+        DataStream<TempRecord> keyedTemp = tempStream
+                .filter(r -> r.getDuplicate() == null || r.getDuplicate() == false)
+                .keyBy(r -> r.getLocationId());
+        DataStream<PressRecord> keyedPress = pressStream
+                .filter(r -> r.getDuplicate() == null || r.getDuplicate() == false)
+                .keyBy(r -> r.getLocationId());
 
         // join streams
         DataStream<JoinedRecord> stream = keyedTemp.connect(keyedPress)
@@ -53,7 +60,7 @@ public class JoinPressPipeline extends FlinkPipeline {
                 .name("joined");
 
 //        stream.filter(v -> false).print();
-        stream.print();
-//        stream.sinkTo(sink()).name("sink");
+//        stream.print();
+        stream.sinkTo(sink()).name("sink");
     }
 }

@@ -9,6 +9,6 @@ import org.junit.jupiter.api.Test;
 public class DeduplicatePipelineTest extends FlinkPipelineTest {
     @Test
     public void testPipeline() throws Exception {
-        new DeduplicatePipeline(getPipelineConfig(), env()).run();
+        new DeduplicatePipeline(getPipelineConfig(), env("deduplicate-pipeline")).run();
     }
 }

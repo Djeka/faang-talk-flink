@@ -38,9 +38,11 @@ public abstract class FlinkPipelineTest {
         new PressRecordsGenerator(pipelineConfig).start();
     }
 
-    public StreamExecutionEnvironment env(){
+    public StreamExecutionEnvironment env(String pipelineName) {
         Map<String, String> config = pipelineConfig.getFlinkConfig().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString()));
+
+        config.put("metrics.reporter.grph.prefix", "faang." + pipelineName);
 
         return StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(Configuration.fromMap(config));
     }

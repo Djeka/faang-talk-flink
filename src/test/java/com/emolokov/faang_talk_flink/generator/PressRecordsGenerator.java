@@ -36,9 +36,10 @@ public class PressRecordsGenerator extends EventsGenerator<PressRecord> {
                 default: throw new RuntimeException("Unsupported unit: " + template.getUnit());
             }
 
+            var timestamp = System.currentTimeMillis();
             return List.of(
                     new PressRecord(
-                            System.currentTimeMillis(),
+                            timestamp,
                             template.getMeterId(),
                             template.getLocationId(),
                             template.getUnit(),

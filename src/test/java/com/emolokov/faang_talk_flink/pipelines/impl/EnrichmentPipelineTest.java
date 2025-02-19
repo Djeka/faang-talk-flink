@@ -9,6 +9,6 @@ import org.junit.jupiter.api.Test;
 public class EnrichmentPipelineTest extends FlinkPipelineTest {
     @Test
     public void testPipeline() throws Exception {
-        new EnrichmentPipeline(getPipelineConfig(), env()).run();
+        new EnrichmentPipeline(getPipelineConfig(), env("enrichment-pipeline")).run();
     }
 }

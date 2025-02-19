@@ -8,7 +8,7 @@ kafka-params:
   group.id: test-consumer
   transaction.timeout.ms: 900000
 flink-config:
-  parallelism.default: 1
+  parallelism.default: 3
 
   state.checkpoints.dir: file:///tmp/flink/checkpoints
   execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
@@ -66,7 +66,7 @@ flink-config:
   metrics.reporter.grph.host: localhost
   metrics.reporter.grph.interval: 1 SECONDS
   metrics.reporter.grph.port: 2003
-  metrics.reporter.grph.prefix: faang.align-temp-pipeline
+  metrics.reporter.grph.prefix: faang.unknown-pipeline
   metrics.reporter.grph.protocol: TCP
   metrics.scope.jm: jm.self
   metrics.scope.jm.job: jm.job
