@@ -6,7 +6,6 @@ import com.emolokov.faang_talk_flink.model.records.MeterRecord;
 import com.emolokov.faang_talk_flink.model.records.Record;
 import com.emolokov.faang_talk_flink.model.serde.MeterRecordDeserializer;
 import com.emolokov.faang_talk_flink.model.serde.MeterRecordSerializer;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -15,6 +14,7 @@ import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -25,13 +25,18 @@ import java.time.Duration;
 import java.util.Properties;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
 
-@AllArgsConstructor
-@Getter
 @Slf4j
+@Getter
 public abstract class FlinkPipeline {
-    protected final PipelineConfig pipelineConfig;
     protected final StreamExecutionEnvironment env;
+    protected final PipelineConfig pipelineConfig;
+
+    public FlinkPipeline(PipelineConfig pipelineConfig, StreamExecutionEnvironment env) {
+        this.pipelineConfig = pipelineConfig;
+        this.env = updateEnv(env);
+    }
 
     public void run(){
         buildFlinkPipeline();
@@ -52,6 +57,12 @@ public abstract class FlinkPipeline {
         env.close();
     }
 
+    protected StreamExecutionEnvironment updateEnv(StreamExecutionEnvironment env) {
+        EmbeddedRocksDBStateBackend rocksDBStateBackend = new EmbeddedRocksDBStateBackend();
+        env.setStateBackend(rocksDBStateBackend);
+        return env;
+    }
+
     protected abstract void buildFlinkPipeline();
 
     protected <R extends MeterRecord> SingleOutputStreamOperator<R> enrich(DataStream<R> input){
@@ -65,6 +76,7 @@ public abstract class FlinkPipeline {
 
     protected <R extends MeterRecord> DataStream<R> createSource(String topic, Class<R> clazz, int parallelism) {
         Properties kafkaProps = new Properties();
+        kafkaProps.put(BOOTSTRAP_SERVERS_CONFIG, pipelineConfig.getKafkaBootstrapServers());
         kafkaProps.putAll(pipelineConfig.getKafkaParams());
 
         KafkaSource<R> kafkaSource = KafkaSource.<R>builder()
@@ -89,6 +101,7 @@ public abstract class FlinkPipeline {
 
     protected <R extends Record> KafkaSink<R> sink() {
         Properties kafkaProps = new Properties();
+        kafkaProps.put(BOOTSTRAP_SERVERS_CONFIG, pipelineConfig.getKafkaBootstrapServers());
         kafkaProps.putAll(pipelineConfig.getKafkaParams());
 
         return KafkaSink.<R>builder()

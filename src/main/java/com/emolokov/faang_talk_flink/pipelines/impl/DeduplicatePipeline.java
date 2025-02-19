@@ -1,9 +1,9 @@
 package com.emolokov.faang_talk_flink.pipelines.impl;
 
-import com.emolokov.faang_talk_flink.functions.DeduplicateFunction;
-import com.emolokov.faang_talk_flink.model.records.TempRecord;
-import com.emolokov.faang_talk_flink.model.PipelineConfig;
 import com.emolokov.faang_talk_flink.functions.AlignTempFunction;
+import com.emolokov.faang_talk_flink.functions.DeduplicateFunction;
+import com.emolokov.faang_talk_flink.model.PipelineConfig;
+import com.emolokov.faang_talk_flink.model.records.TempRecord;
 import com.emolokov.faang_talk_flink.pipelines.FlinkPipeline;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.streaming.api.datastream.DataStream;

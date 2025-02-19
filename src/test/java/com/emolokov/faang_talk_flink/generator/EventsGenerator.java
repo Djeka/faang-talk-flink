@@ -38,11 +38,11 @@ public abstract class EventsGenerator<R extends MeterRecord> {
     private String topic;
     private final Supplier<List<R>> eventsSupplier;
 
-    public void start(){
+    public Future<?> start(){
         Producer<Bytes, Bytes> producer = newProducer();
 
         RateLimiter produceLimiter = RateLimiter.create(generateRatePerSecond);
-        Executors.newSingleThreadExecutor().submit(() -> {
+        return Executors.newSingleThreadExecutor().submit(() -> {
             while (true){
                 produceLimiter.acquire();
 

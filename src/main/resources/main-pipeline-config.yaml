@@ -1,8 +1,12 @@
 temp-meters-topic: temp_records_topic
 press-meters-topic: press_records_topic
 sink-topic: sink_topic
-kafka-bootstrap-servers: 127.0.0.1:29092
-disable-operators-chain: true
+kafka-bootstrap-servers: kafka:9092
+enrichment-endpoint: http://127.0.0.1:80/enrichment
+disable-operators-chain: false
+kafka-params:
+  group.id: main-consumer
+  transaction.timeout.ms: 900000
 flink-config:
   parallelism.default: 1
 
@@ -59,7 +63,7 @@ flink-config:
 
   metrics.reporters: grph
   metrics.reporter.grph.factory.class: org.apache.flink.metrics.graphite.GraphiteReporterFactory
-  metrics.reporter.grph.host: localhost
+  metrics.reporter.grph.host: graphite
   metrics.reporter.grph.interval: 1 SECONDS
   metrics.reporter.grph.port: 2003
   metrics.reporter.grph.prefix: faang.align-temp-pipeline

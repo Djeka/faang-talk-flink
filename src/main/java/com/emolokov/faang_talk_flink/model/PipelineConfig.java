@@ -3,6 +3,8 @@ package com.emolokov.faang_talk_flink.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -39,4 +41,14 @@ public class PipelineConfig implements Serializable {
 
     @JsonProperty("flink-config")
     private Map<String, Object> flinkConfig;
+
+    protected static final ObjectMapper YAML_MAPPER = new YAMLMapper();
+
+    public static PipelineConfig load(String pipelineConfigResource) {
+        try {
+            return YAML_MAPPER.readValue(PipelineConfig.class.getResourceAsStream("/" + pipelineConfigResource), PipelineConfig.class);
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -1,10 +1,12 @@
 package com.emolokov.faang_talk_flink.functions;
 
 import com.emolokov.faang_talk_flink.model.records.TempRecord;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.RichMapFunction;
 
 import java.io.Serializable;
 
+@Slf4j
 public class AlignTempFunction extends RichMapFunction<TempRecord, TempRecord> implements Serializable {
     @Override
     public TempRecord map(TempRecord record) throws Exception {
@@ -16,6 +18,7 @@ public class AlignTempFunction extends RichMapFunction<TempRecord, TempRecord> i
         }
 
         record.setTempUnit("C");
+        log.info("Aligned {} temperature", record.getTempValue());
         return record;
     }
 }

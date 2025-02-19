@@ -43,6 +43,23 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  jobmanager:
+    image: apache/flink:1.17
+    command: jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    ports:
+      - 28081:8081  # Exposes the Flink web UI at port 28081
+
+  taskmanager:
+    image: apache/flink:1.17
+    command: taskmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      - NUM_TASK_SLOTS=10
+    depends_on:
+      - jobmanager
+
 networks:
   grafana-net:
 
